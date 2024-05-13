@@ -17,6 +17,10 @@
                     {
                         "id": 2,
                         "grade": 82
+                    },
+                    {
+                        "id": 4,
+                        "grade": 90
                     }
                 ]
             }
@@ -28,70 +32,25 @@
         "patronimic": "Васильович",
         "email": "oleksiy.kovalenko@example.com",
         "phone": "+380 98765 4321",
-        "birthDate": "15.06.1999",
+        "birthDate": "15.06.2003",
         "semesters": [
             {
                 "semesterNumber": 5,
-                "subjects": [
-                    {
-                        "id": 5,
-                        "grade": 91
-                    },
-                    {
-                        "id": 3,
-                        "grade": 87
-                    }
-                ]
-            },
-            {
-                "semesterNumber": 6,
                 "subjects": [
                     {
                         "id": 1,
-                        "grade": 92
+                        "grade": 82
                     },
                     {
                         "id": 2,
-                        "grade": 90
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "name": "Марія",
-        "surname": "Шевченко",
-        "patronimic": "Дмитрівна",
-        "email": "maria.shevchenko@example.com",
-        "phone": "+380 98765 1234",
-        "birthDate": "22.11.2000",
-        "semesters": [
-            {
-                "semesterNumber": 5,
-                "subjects": [
-                    {
-                        "id": 2,
-                        "grade": 88
+                        "grade": 75
                     },
                     {
-                        "id": 5,
-                        "grade": 84
+                        "id": 3,
+                        "grade": 60
                     }
                 ]
-            },
-            {
-                "semesterNumber": 6,
-                "subjects": [
-                    {
-                        "id": 2,
-                        "grade": 89
-                    },
-                    {
-                        "id": 5,
-                        "grade": 85
-                    }
-                ]
-            }
+            }          
         ]
     }
 ]

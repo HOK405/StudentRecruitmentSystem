@@ -1,30 +1,28 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using StudentRecruitment.BLL.DTOs;
-using StudentRecruitment.BLL.Utilities;
-using StudentRecruitment.DAL;
+using StudentRecruitment.BLL.DTOs.Output;
+using StudentRecruitment.DAL.Interfaces;
 using StudentRecruitment.Domain.Entities;
+using StudentRecruitment.Shared.DTOs;
 
 namespace StudentRecruitment.BLL.Services
 {
     public class StudentService
     {
         private readonly UserManager<Student> _userManager;
-        private readonly ApidDbContext _context;
         private readonly IConfiguration _configuration;
-        private readonly CredentialsGenerator _credentialsGenerator;
+        private readonly IStudentRepository _studentRepository;
 
         public StudentService(
-            UserManager<Student> userManager, 
-            ApidDbContext context, 
-            IConfiguration configuration, 
-            CredentialsGenerator credentialsGenerator)
+            UserManager<Student> userManager,
+            IConfiguration configuration,
+            IStudentRepository studentRepository)
         {
             _userManager = userManager;
-            _context = context;
             _configuration = configuration;
-            _credentialsGenerator = credentialsGenerator;
+            _studentRepository = studentRepository;
         }
 
         public async Task ImportStudentsFromFileAsync()
@@ -36,48 +34,42 @@ namespace StudentRecruitment.BLL.Services
             }
 
             var jsonData = await File.ReadAllTextAsync(filePath);
-            var students = JsonConvert.DeserializeObject<List<StudentImportDto>>(jsonData);  
-            var credentials = new List<CredentialDto>();
+            var students = JsonConvert.DeserializeObject<List<StudentImportDto>>(jsonData);
 
-            foreach (var studentDto in students)
-            {
-                var student = new Student
-                {
-                    UserName = await _credentialsGenerator.GenerateUsername(studentDto),
-                    Email = studentDto.Email,
-                    PhoneNumber = studentDto.Phone,
-                    BirthDate = DateTime.Parse(studentDto.BirthDate),
-                    Name = studentDto.Name,
-                    Surname = studentDto.Surname,
-                    Patronimic = studentDto.Patronimic,
-                    IsPublicProfile = false
-                };
-
-                var password = _credentialsGenerator.GeneratePassword();
-                var result = await _userManager.CreateAsync(student, password);
-
-                if (result.Succeeded)
-                {
-                    credentials.Add(new CredentialDto { Username = student.UserName, Password = password });
-
-                    foreach (var semester in studentDto.Semesters) 
-                    {
-                        foreach (var subject in semester.Subjects) 
-                        {
-                            _context.SemesterInfos.Add(new SemesterInfo
-                            {
-                                StudentId = student.Id,
-                                SubjectId = subject.Id,
-                                Grade = subject.Grade,
-                                Semester = semester.SemesterNumber
-                            });
-                        }
-                    }
-                    await _context.SaveChangesAsync();
-                }
-            }
+            var credentials = await _studentRepository.ImportStudentsAsync(students, _userManager);
 
             await File.WriteAllTextAsync("credentials.json", JsonConvert.SerializeObject(credentials));
         }
+
+        public async Task<PagedData<StudentDto>> GetBestSuitedStudentsAsync(List<SubjectRatingDto> subjectRatingDtos, int pageNumber = 1, int pageSize = 30)
+        {
+            var subjectRatings = subjectRatingDtos.ToDictionary(sr => sr.SubjectId, sr => sr.Rating);
+
+            var students = await _studentRepository.GetBestSuitedStudentsAsync(subjectRatings);
+
+            var totalStudents = students.Count();
+            var pagedStudents = students
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var studentDtos = pagedStudents.Select(student => new StudentDto
+            {
+                Id = student.Id,
+                Name = student.Name,
+                Surname = student.Surname,
+                Patronimic = student.Patronimic,
+                BirthDate = student.BirthDate
+            }).ToList();
+
+            return new PagedData<StudentDto>
+            {
+                Results = studentDtos,
+                TotalCount = totalStudents,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
     }
 }

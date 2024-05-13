@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using StudentRecruitment.BLL.DTOs;
 using StudentRecruitment.Domain.Entities;
+using StudentRecruitment.Shared.DTOs;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace StudentRecruitment.BLL.Utilities
+namespace StudentRecruitment.Shared.Utilities
 {
     public class CredentialsGenerator
     {

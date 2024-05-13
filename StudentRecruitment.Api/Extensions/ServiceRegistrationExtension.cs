@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using StudentRecruitment.BLL.Services;
-using StudentRecruitment.BLL.Utilities;
 using StudentRecruitment.DAL;
 using StudentRecruitment.DAL.Interfaces;
 using StudentRecruitment.DAL.Repositories;
 using StudentRecruitment.Domain.Entities;
+using StudentRecruitment.Shared.Utilities;
 
 namespace StudentRecruitment.Api.Extensions
 {
@@ -26,6 +26,7 @@ namespace StudentRecruitment.Api.Extensions
 
             // Repositories registration
             services.AddScoped<ISubjectRepository, SubjectRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
 
             // Utils classes
             services.AddScoped<CredentialsGenerator>();

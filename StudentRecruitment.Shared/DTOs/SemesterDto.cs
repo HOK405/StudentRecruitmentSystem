@@ -1,4 +1,4 @@
-﻿namespace StudentRecruitment.BLL.DTOs
+﻿namespace StudentRecruitment.Shared.DTOs
 {
     public class SemesterDto
     {
