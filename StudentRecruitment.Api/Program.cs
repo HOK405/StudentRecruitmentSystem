@@ -1,15 +1,32 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using StudentRecruitment.Api.Extensions;
+using StudentRecruitment.DAL;
+using StudentRecruitment.Domain.Entities;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("The 'DefaultConnection' connection string is not defined in appsettings.json.");
+}
+
+builder.Services.AddDbContext<ApidDbContext>(options =>
+    options.UseSqlServer(connectionString)
+           .EnableSensitiveDataLogging());
+
+
+builder.Services.AddServices();
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

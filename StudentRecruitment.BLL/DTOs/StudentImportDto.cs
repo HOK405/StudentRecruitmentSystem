@@ -8,7 +8,6 @@
         public string Email { get; set; }
         public string Phone { get; set; }
         public string BirthDate { get; set; }
-        public int Semester { get; set; }
-        public List<SubjectDto> Subjects { get; set; }
+        public List<SemesterDto> Semesters { get; set; }
     }
 }
