@@ -21,5 +21,16 @@ namespace StudentRecruitment.Api.Controllers
             var result = await _studentService.GetBestSuitedStudentsAsync(subjectRatingDtos, pageNumber, pageSize);
             return Ok(result);
         }
+
+        [HttpGet("{studentId}/grades")]
+        public async Task<IActionResult> GetStudentWithGrades(int studentId)
+        {
+            var studentWithGrades = await _studentService.GetStudentWithGradesAsync(studentId);
+            if (studentWithGrades == null)
+            {
+                return NotFound();
+            }
+            return Ok(studentWithGrades);
+        }
     }
 }

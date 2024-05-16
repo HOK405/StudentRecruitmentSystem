@@ -104,5 +104,13 @@ namespace StudentRecruitment.DAL.Repositories
 
             return sortedStudents;
         }
+
+        public async Task<Student> GetStudentWithGradesAsync(int studentId)
+        {
+            return await _dbContext.Students
+                .Include(s => s.SemesterInfos)
+                    .ThenInclude(si => si.Subject)
+                .FirstOrDefaultAsync(s => s.Id == studentId);
+        }
     }
 }

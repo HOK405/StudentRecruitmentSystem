@@ -28,5 +28,11 @@ namespace StudentRecruitment.DAL.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public IQueryable<Subject> GetSubjects()
+        {
+            return _context.Subjects.AsQueryable();
+        }
     }
+
 }

@@ -40,7 +40,7 @@ namespace StudentRecruitment.BLL.Services
             await File.WriteAllTextAsync("credentials.json", JsonConvert.SerializeObject(credentials));
         }
 
-        public async Task<PagedData<StudentDto>> GetBestSuitedStudentsAsync(List<SubjectRatingDto> subjectRatingDtos, int pageNumber = 1, int pageSize = 30)
+        public async Task<PagedData<StudentModel>> GetBestSuitedStudentsAsync(List<SubjectRatingDto> subjectRatingDtos, int pageNumber = 1, int pageSize = 30)
         {
             var subjectRatings = subjectRatingDtos.ToDictionary(sr => sr.SubjectId, sr => sr.Rating);
 
@@ -52,7 +52,7 @@ namespace StudentRecruitment.BLL.Services
                 .Take(pageSize)
                 .ToList();
 
-            var studentDtos = pagedStudents.Select(student => new StudentDto
+            var studentDtos = pagedStudents.Select(student => new StudentModel
             {
                 Id = student.Id,
                 Name = student.Name,
@@ -61,13 +61,36 @@ namespace StudentRecruitment.BLL.Services
                 BirthDate = student.BirthDate
             }).ToList();
 
-            return new PagedData<StudentDto>
+            return new PagedData<StudentModel>
             {
                 Results = studentDtos,
                 TotalCount = totalStudents,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             };
+        }
+
+        public async Task<StudentWithGradesOutputModel> GetStudentWithGradesAsync(int studentId)
+        {
+            var student = await _studentRepository.GetStudentWithGradesAsync(studentId);
+            if (student == null) return null;
+
+            var outputModel = new StudentWithGradesOutputModel
+            {
+                Name = student.Name,
+                Surname = student.Surname,
+                Patronimic = student.Patronimic,
+                Description = student.Description,
+                BirthDate = student.BirthDate,
+                SemesterGrades = student.SemesterInfos.Select(si => new SemesterGrade
+                {
+                    Semester = si.Semester,
+                    Grade = si.Grade,
+                    SubjectName = si.Subject.Name
+                }).ToList()
+            };
+
+            return outputModel;
         }
     }
 }

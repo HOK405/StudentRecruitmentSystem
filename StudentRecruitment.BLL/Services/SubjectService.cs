@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using StudentRecruitment.BLL.DTOs.Output;
 using StudentRecruitment.DAL.Interfaces;
 using StudentRecruitment.Domain.Entities;
 
@@ -33,6 +35,27 @@ namespace StudentRecruitment.BLL.Services
                 await _subjectRepository.AddSubjectsAsync(subjects);
                 await _subjectRepository.SaveChangesAsync();
             }
+        }
+
+        public async Task<PagedData<SubjectOutputModel>> GetPagedSubjectsAsync(int pageNumber, int pageSize)
+        {
+            var query = _subjectRepository.GetSubjects();
+            var totalCount = await query.CountAsync();
+            var results = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize)
+                .Select(s => new SubjectOutputModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Description = s.Description
+                }).ToListAsync();
+
+            return new PagedData<SubjectOutputModel>
+            {
+                Results = results,
+                TotalCount = totalCount,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
         }
     }
 }

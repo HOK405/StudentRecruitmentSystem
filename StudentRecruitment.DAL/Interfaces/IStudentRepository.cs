@@ -11,5 +11,7 @@ namespace StudentRecruitment.DAL.Interfaces
         Task<List<CredentialDto>> ImportStudentsAsync(
             List<StudentImportDto> students,
             UserManager<Student> userManager);
+
+        Task<Student> GetStudentWithGradesAsync(int studentId);
     }
 }

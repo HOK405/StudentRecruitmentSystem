@@ -1,0 +1,61 @@
+﻿@page "/student-info"
+@using StudentRecruitment.Presentation.Models
+@inject HttpClient Http
+
+<h3>Student Information</h3>
+
+<EditForm Model="studentIdModel" OnValidSubmit="GetStudentInfo">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="studentId">Enter Student ID:</label>
+        <InputNumber id="studentId" @bind-Value="studentIdModel.StudentId" />
+        <ValidationMessage For="@(() => studentIdModel.StudentId)" />
+    </div>
+
+    <button type="submit">Get Student Info</button>
+</EditForm>
+
+@if (studentInfo != null)
+{
+    <div>
+        <h4>Student Details</h4>
+        <p>Name: @studentInfo.Name</p>
+        <p>Surname: @studentInfo.Surname</p>
+        <p>Patronimic: @studentInfo.Patronimic</p>
+        <p>Description: @studentInfo.Description</p>
+        <p>Birth Date: @studentInfo.BirthDate.ToShortDateString()</p>
+
+        <h4>Semester Grades</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Semester</th>
+                    <th>Grade</th>
+                    <th>Subject</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var grade in studentInfo.SemesterGrades)
+                {
+                    <tr>
+                        <td>@grade.Semester</td>
+                        <td>@grade.Grade</td>
+                        <td>@grade.SubjectName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private StudentIdInputModel studentIdModel = new StudentIdInputModel();
+    private StudentWithGradesModel studentInfo;
+
+    private async Task GetStudentInfo()
+    {
+        studentInfo = await Http.GetFromJsonAsync<StudentWithGradesModel>($"api/student/{studentIdModel.StudentId}/grades");
+    }
+}

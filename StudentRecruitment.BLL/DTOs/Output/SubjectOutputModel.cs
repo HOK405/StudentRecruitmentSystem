@@ -1,6 +1,6 @@
-﻿namespace StudentRecruitment.Presentation.Models
+﻿namespace StudentRecruitment.BLL.DTOs.Output
 {
-    public class SubjectModel
+    public class SubjectOutputModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

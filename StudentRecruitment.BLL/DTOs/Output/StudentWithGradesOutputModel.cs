@@ -1,11 +1,12 @@
 ﻿namespace StudentRecruitment.BLL.DTOs.Output
 {
-    public class StudentDto
+    public class StudentWithGradesOutputModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Patronimic { get; set; }
+        public string Description { get; set; }
         public DateTime BirthDate { get; set; }
+        public List<SemesterGrade> SemesterGrades { get; set; }
     }
 }

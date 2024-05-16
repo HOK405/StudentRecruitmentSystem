@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using StudentRecruitment.Presentation.Data;
-
 namespace StudentRecruitment.Presentation
 {
     public class Program
@@ -13,7 +9,6 @@ namespace StudentRecruitment.Presentation
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44315") });
 
