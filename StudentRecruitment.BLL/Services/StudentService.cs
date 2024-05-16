@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using StudentRecruitment.BLL.DTOs.Output;
@@ -70,6 +69,5 @@ namespace StudentRecruitment.BLL.Services
                 PageSize = pageSize
             };
         }
-
     }
 }

@@ -75,7 +75,7 @@ namespace StudentRecruitment.DAL.Repositories
                     si.SubjectId,
                     si.Grade
                 })
-                .ToListAsync(); 
+                .ToListAsync();
 
             var groupedScores = studentScores
                 .GroupBy(si => si.StudentId)
@@ -84,12 +84,12 @@ namespace StudentRecruitment.DAL.Repositories
                     StudentId = g.Key,
                     TotalScore = g.Sum(si => si.Grade * subjectRatings[si.SubjectId])
                 })
-                .ToList(); 
+                .ToList();
 
             var studentIds = groupedScores.Select(s => s.StudentId).ToList();
 
             var students = await _dbContext.Students
-                .Where(s => studentIds.Contains(s.Id))
+                .Where(s => studentIds.Contains(s.Id) && s.IsPublicProfile) 
                 .ToListAsync();
 
             var sortedStudents = students
