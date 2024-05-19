@@ -32,5 +32,17 @@ namespace StudentRecruitment.Api.Controllers
             }
             return Ok(studentWithGrades);
         }
+
+        [HttpDelete("{studentId}")]
+        public async Task<IActionResult> DeleteStudent(int studentId)
+        {
+            var result = await _studentService.DeleteStudentByIdAsync(studentId);
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { Message = "Student has been successfully deleted." });
+        }
     }
 }

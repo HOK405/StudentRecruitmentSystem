@@ -1,0 +1,46 @@
+﻿/* Add padding and margins to elements for better spacing */
+.row {
+    margin-bottom: 15px;
+}
+
+.col-md-4 {
+    margin-bottom: 15px;
+}
+
+/* Style the input fields */
+input[type="text"], input[type="number"] {
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* Style the buttons */
+button {
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+/* Style the suggestion list */
+ul.list-group {
+    margin-top: 5px;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+    ul.list-group li {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+        ul.list-group li:hover {
+            background-color: #f8f9fa;
+        }
+
+    /* Ensure the suggestion list is clickable */
+    ul.list-group li {
+        cursor: pointer;
+    }

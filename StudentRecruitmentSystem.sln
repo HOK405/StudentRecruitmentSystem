@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentRecruitment.BLL", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentRecruitment.Shared", "StudentRecruitment.Shared\StudentRecruitment.Shared.csproj", "{4BE45D12-6CAE-47B9-8EEB-A4C087EC070D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentRecruitment.Presentation", "StudentRecruitment.Presentation\StudentRecruitment.Presentation.csproj", "{197F5D86-E2E2-46B0-9A7A-340BC6DB7A68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentRecruitment.Presentation", "StudentRecruitment.Presentation\StudentRecruitment.Presentation.csproj", "{197F5D86-E2E2-46B0-9A7A-340BC6DB7A68}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

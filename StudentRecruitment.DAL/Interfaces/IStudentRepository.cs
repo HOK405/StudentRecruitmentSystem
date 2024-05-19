@@ -6,6 +6,8 @@ namespace StudentRecruitment.DAL.Interfaces
 {
     public interface IStudentRepository
     {
+        Task<Student> GetStudentByIdAsync(int studentId);
+
         Task<List<Student>> GetBestSuitedStudentsAsync(Dictionary<int, int> subjectRatings);
 
         Task<List<CredentialDto>> ImportStudentsAsync(
@@ -13,5 +15,9 @@ namespace StudentRecruitment.DAL.Interfaces
             UserManager<Student> userManager);
 
         Task<Student> GetStudentWithGradesAsync(int studentId);
+
+        Task DeleteStudentAsync(Student student);
+
+        Task SaveChangesAsync();
     }
 }

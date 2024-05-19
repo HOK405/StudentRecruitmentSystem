@@ -33,6 +33,12 @@ namespace StudentRecruitment.DAL.Repositories
         {
             return _context.Subjects.AsQueryable();
         }
-    }
 
+        public async Task<List<Subject>> GetSubjectsByNameAsync(string name)
+        {
+            return await _context.Subjects
+                                 .Where(s => s.Name.Contains(name))
+                                 .ToListAsync();
+        }
+    }
 }

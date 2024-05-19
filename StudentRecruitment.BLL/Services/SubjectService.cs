@@ -37,6 +37,17 @@ namespace StudentRecruitment.BLL.Services
             }
         }
 
+        public async Task<List<SubjectOutputModel>> SearchSubjectsByNameAsync(string name)
+        {
+            var subjects = await _subjectRepository.GetSubjectsByNameAsync(name);
+            return subjects.Select(s => new SubjectOutputModel
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Description = s.Description
+            }).ToList();
+        }
+
         public async Task<PagedData<SubjectOutputModel>> GetPagedSubjectsAsync(int pageNumber, int pageSize)
         {
             var query = _subjectRepository.GetSubjects();

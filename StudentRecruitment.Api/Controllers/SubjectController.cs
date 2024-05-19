@@ -19,5 +19,12 @@ namespace StudentRecruitment.Api.Controllers
             var pagedSubjects = await _subjectService.GetPagedSubjectsAsync(pageNumber, pageSize);
             return Ok(pagedSubjects);
         }
+
+        [HttpGet("search-subjects")]
+        public async Task<IActionResult> SearchSubjects([FromQuery] string query)
+        {
+            var subjects = await _subjectService.SearchSubjectsByNameAsync(query);
+            return Ok(subjects);
+        }
     }
 }

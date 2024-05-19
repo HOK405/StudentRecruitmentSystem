@@ -6,6 +6,8 @@ namespace StudentRecruitment.DAL.Interfaces
     {
         Task AddSubjectsAsync(IEnumerable<Subject> subjects);
         IQueryable<Subject> GetSubjects();
+
+        Task<List<Subject>> GetSubjectsByNameAsync(string name);
         Task SaveChangesAsync();
     }
 }

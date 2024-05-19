@@ -105,12 +105,19 @@ namespace StudentRecruitment.DAL.Repositories
             return sortedStudents;
         }
 
-        public async Task<Student> GetStudentWithGradesAsync(int studentId)
+        public async Task<Student> GetStudentByIdAsync(int studentId)
         {
-            return await _dbContext.Students
-                .Include(s => s.SemesterInfos)
-                    .ThenInclude(si => si.Subject)
-                .FirstOrDefaultAsync(s => s.Id == studentId);
+            return await _dbContext.Students.FindAsync(studentId);
+        }
+
+        public async Task DeleteStudentAsync(Student student)
+        {
+            _dbContext.Students.Remove(student);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

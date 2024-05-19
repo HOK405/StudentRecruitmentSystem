@@ -92,5 +92,18 @@ namespace StudentRecruitment.BLL.Services
 
             return outputModel;
         }
+
+        public async Task<bool> DeleteStudentByIdAsync(int studentId)
+        {
+            var student = await _studentRepository.GetStudentByIdAsync(studentId);
+            if (student == null)
+            {
+                return false;
+            }
+
+            await _studentRepository.DeleteStudentAsync(student);
+            await _studentRepository.SaveChangesAsync();
+            return true;
+        }
     }
 }

@@ -9,7 +9,20 @@
     @foreach (var subjectRating in subjectRatings)
     {
         <div class="col-md-4">
-            <input type="number" @bind="subjectRating.SubjectId" class="form-control" placeholder="Subject ID" />
+            <div class="position-relative">
+                <input type="text" @bind="subjectRating.SubjectName" class="form-control" placeholder="Search Subject" @oninput="async e => await SearchSubjects(e, subjectRating)" @onfocus="() => SetActiveSubjectRating(subjectRating)" @onblur="ClearActiveSubjectRating" />
+                @if (activeSubjectRating == subjectRating && subjectSuggestions != null && subjectSuggestions.Any())
+                {
+                    <ul class="list-group position-absolute w-100" style="z-index: 1000;">
+                        @foreach (var suggestion in subjectSuggestions)
+                        {
+                            <li class="list-group-item" @onclick="() => SelectSubject(subjectRating, suggestion)">
+                                @suggestion.Name
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
         </div>
         <div class="col-md-4">
             <input type="number" @bind="subjectRating.Rating" class="form-control" placeholder="Rating" />
@@ -49,6 +62,7 @@ else
                 <th>Surname</th>
                 <th>Patronimic</th>
                 <th>Birth Date</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -60,11 +74,70 @@ else
                     <td>@student.Surname</td>
                     <td>@student.Patronimic</td>
                     <td>@student.BirthDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <button class="btn btn-info" @onclick="() => ShowStudentInfo(student.Id)">View</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
+
+@* Modal *@
+<div class="modal fade @(isModalVisible ? "show d-block" : "d-none")" tabindex="-1" role="dialog" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentInfoModalLabel">Student Information</h5>
+                <button type="button" class="close" aria-label="Close" @onclick="CloseModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (modalErrorMessage != null)
+                {
+                    <div class="alert alert-danger">@modalErrorMessage</div>
+                }
+                else if (modalStudentInfo != null)
+                {
+                    <div>
+                        <h4>Student Details</h4>
+                        <p>Name: @modalStudentInfo.Name</p>
+                        <p>Surname: @modalStudentInfo.Surname</p>
+                        <p>Patronimic: @modalStudentInfo.Patronimic</p>
+                        <p>Description: @modalStudentInfo.Description</p>
+                        <p>Birth Date: @modalStudentInfo.BirthDate.ToShortDateString()</p>
+
+                        <h4>Semester Grades</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Grade</th>
+                                    <th>Subject</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var grade in modalStudentInfo.SemesterGrades)
+                                {
+                                    <tr>
+                                        <td>@grade.Semester</td>
+                                        <td>@grade.Grade</td>
+                                        <td>@grade.SubjectName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p>Loading...</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private List<StudentModel> students;
@@ -73,8 +146,15 @@ else
     private int pageSize = 30;
     private List<SubjectRatingModel> subjectRatings = new List<SubjectRatingModel>
     {
-        new SubjectRatingModel { SubjectId = 1, Rating = 5 }
+        new SubjectRatingModel { }
     };
+
+    private StudentWithGradesModel modalStudentInfo;
+    private bool isModalVisible = false;
+    private string modalErrorMessage;
+
+    private List<SubjectModel> subjectSuggestions;
+    private SubjectRatingModel activeSubjectRating;
 
     public async Task SearchStudents()
     {
@@ -100,5 +180,71 @@ else
     private void RemoveSubjectRating(SubjectRatingModel subjectRating)
     {
         subjectRatings.Remove(subjectRating);
+    }
+
+    private async Task ShowStudentInfo(int studentId)
+    {
+        isModalVisible = true;
+        modalErrorMessage = null;
+
+        try
+        {
+            modalStudentInfo = await Http.GetFromJsonAsync<StudentWithGradesModel>($"api/student/{studentId}/grades");
+            if (modalStudentInfo == null)
+            {
+                modalErrorMessage = "Student not found.";
+            }
+        }
+        catch (HttpRequestException)
+        {
+            modalErrorMessage = "Error fetching student information. Please try again.";
+        }
+    }
+
+    private void CloseModal()
+    {
+        isModalVisible = false;
+        modalStudentInfo = null;
+    }
+
+    private async Task SearchSubjects(ChangeEventArgs e, SubjectRatingModel subjectRating)
+    {
+        string query = e.Value.ToString();
+        if (!string.IsNullOrEmpty(query))
+        {
+            var response = await Http.GetFromJsonAsync<List<SubjectModel>>($"api/subject/search-subjects?query={query}");
+            subjectSuggestions = response;
+            activeSubjectRating = subjectRating;
+        }
+        else
+        {
+            subjectSuggestions = null;
+            activeSubjectRating = null;
+        }
+    }
+
+    private void SetActiveSubjectRating(SubjectRatingModel subjectRating)
+    {
+        activeSubjectRating = subjectRating;
+    }
+
+    private void ClearActiveSubjectRating()
+    {
+        // Delay to allow selection
+        Task.Delay(200).ContinueWith(_ =>
+        {
+            if (activeSubjectRating != null)
+            {
+                InvokeAsync(() => activeSubjectRating = null);
+            }
+        });
+    }
+
+    private void SelectSubject(SubjectRatingModel subjectRating, SubjectModel selectedSubject)
+    {
+        subjectRating.SubjectId = selectedSubject.Id;
+        subjectRating.SubjectName = selectedSubject.Name;
+        subjectSuggestions = null;
+        activeSubjectRating = null;
     }
 }

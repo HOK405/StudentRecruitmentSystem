@@ -1,0 +1,66 @@
+﻿@page "/admin"
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+<h3>Admin Page</h3>
+
+<div class="row">
+    <div class="col-md-6">
+        <button class="btn btn-primary" @onclick="ImportSubjects">Import Subjects</button>
+        <div class="mt-2">
+            @if (subjectImportMessage != null)
+            {
+                <div class="alert alert-info">@subjectImportMessage</div>
+            }
+        </div>
+    </div>
+    <div class="col-md-6">
+        <button class="btn btn-primary" @onclick="ImportStudents">Import Students</button>
+        <div class="mt-2">
+            @if (studentImportMessage != null)
+            {
+                <div class="alert alert-info">@studentImportMessage</div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private string subjectImportMessage;
+    private string studentImportMessage;
+
+    private async Task ImportSubjects()
+    {
+        var response = await Http.PostAsync("api/systemmanagement/import-subjects-data", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<ImportResponse>();
+            subjectImportMessage = result.Message;
+        }
+        else
+        {
+            subjectImportMessage = "Failed to import subjects.";
+        }
+    }
+
+    private async Task ImportStudents()
+    {
+        var response = await Http.PostAsync("api/systemmanagement/import-students-data", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<ImportResponse>();
+            studentImportMessage = result.Message;
+        }
+        else
+        {
+            studentImportMessage = "Failed to import students.";
+        }
+    }
+
+    public class ImportResponse
+    {
+        public string Message { get; set; }
+    }
+}
