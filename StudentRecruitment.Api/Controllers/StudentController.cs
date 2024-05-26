@@ -16,7 +16,10 @@ namespace StudentRecruitment.Api.Controllers
         }
 
         [HttpPost("get-students-rating")]
-        public async Task<IActionResult> GetStudentsRating([FromBody] List<SubjectRatingDto> subjectRatingDtos, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 30)
+        public async Task<IActionResult> GetStudentsRating(
+            [FromBody] List<SubjectRatingDto> subjectRatingDtos, 
+            [FromQuery] int pageNumber = 1, 
+            [FromQuery] int pageSize = 30)
         {
             var result = await _studentService.GetBestSuitedStudentsAsync(subjectRatingDtos, pageNumber, pageSize);
             return Ok(result);

@@ -1,0 +1,76 @@
+﻿@page "/myprofile"
+@using StudentRecruitment.Presentation.Models
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<h3>MyProfile</h3>
+
+<div>
+    <label for="studentId">Enter Student ID:</label>
+    <input type="number" id="studentId" @bind="inputStudentId" />
+    <button @onclick="LoadStudentData">Search</button>
+</div>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (studentWithGrades != null && groupedGrades != null)
+{
+    <div>
+        <h4>@studentWithGrades.Name @studentWithGrades.Surname</h4>
+        <p><strong>Description:</strong> @studentWithGrades.Description</p>
+        <p><strong>Birth Date:</strong> @studentWithGrades.BirthDate.ToString("yyyy-MM-dd")</p>
+
+        @foreach (var semester in groupedGrades.Keys.OrderByDescending(k => k))
+        {
+            <article>
+                <h5>Semester @semester</h5>
+                <ul>
+                    @foreach (var grade in groupedGrades[semester])
+                    {
+                        <li>
+                            <strong>@grade.SubjectName:</strong> Grade: @grade.Grade
+                        </li>
+                    }
+                </ul>
+            </article>
+        }
+    </div>
+}
+else if (!isLoading)
+{
+    <p>No data found or error occurred.</p>
+}
+
+@code {
+    private int inputStudentId;
+    private StudentWithGradesModel studentWithGrades;
+    private Dictionary<int, List<SemesterGrade>> groupedGrades;
+    private bool isLoading;
+
+    private async Task LoadStudentData()
+    {
+        isLoading = true;
+        studentWithGrades = null;
+        groupedGrades = new Dictionary<int, List<SemesterGrade>>();
+
+        try
+        {
+            studentWithGrades = await Http.GetFromJsonAsync<StudentWithGradesModel>($"api/student/{inputStudentId}/grades");
+            if (studentWithGrades?.SemesterGrades != null)
+            {
+                // Grouping grades by semester
+                groupedGrades = studentWithGrades.SemesterGrades
+                    .GroupBy(g => g.Semester)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+            }
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+
+        isLoading = false;
+    }
+}

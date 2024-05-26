@@ -34,7 +34,7 @@ namespace StudentRecruitment.DAL.Repositories
                     Name = studentDto.Name,
                     Surname = studentDto.Surname,
                     Patronimic = studentDto.Patronimic,
-                    IsPublicProfile = false
+                    IsPublicProfile = true
                 };
 
                 var password = _credentialsGenerator.GeneratePassword();
@@ -62,6 +62,11 @@ namespace StudentRecruitment.DAL.Repositories
             }
 
             return credentials;
+        }
+
+        public async Task<Student> GetStudentByIdAsync(int studentId)
+        {
+            return await _dbContext.Students.FindAsync(studentId);
         }
 
         // Алгоритм зваженого оціюнвання
@@ -105,9 +110,12 @@ namespace StudentRecruitment.DAL.Repositories
             return sortedStudents;
         }
 
-        public async Task<Student> GetStudentByIdAsync(int studentId)
+        public async Task<Student> GetStudentWithGradesAsync(int studentId)
         {
-            return await _dbContext.Students.FindAsync(studentId);
+            return await _dbContext.Students
+                .Include(s => s.SemesterInfos)
+                    .ThenInclude(si => si.Subject)
+                .FirstOrDefaultAsync(s => s.Id == studentId);
         }
 
         public async Task DeleteStudentAsync(Student student)

@@ -98,7 +98,7 @@ else
                 {
                     <div class="alert alert-danger">@modalErrorMessage</div>
                 }
-                else if (modalStudentInfo != null)
+                else if (modalStudentInfo != null && groupedSemesterGrades != null)
                 {
                     <div>
                         <h4>Student Details</h4>
@@ -109,25 +109,27 @@ else
                         <p>Birth Date: @modalStudentInfo.BirthDate.ToShortDateString()</p>
 
                         <h4>Semester Grades</h4>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Semester</th>
-                                    <th>Grade</th>
-                                    <th>Subject</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var grade in modalStudentInfo.SemesterGrades)
-                                {
+                        @foreach (var semester in groupedSemesterGrades.Keys.OrderByDescending(k => k))
+                        {
+                            <h5>Semester @semester</h5>
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td>@grade.Semester</td>
-                                        <td>@grade.Grade</td>
-                                        <td>@grade.SubjectName</td>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var grade in groupedSemesterGrades[semester])
+                                    {
+                                        <tr>
+                                            <td>@grade.SubjectName</td>
+                                            <td>@grade.Grade</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
                     </div>
                 }
                 else
@@ -135,15 +137,17 @@ else
                     <p>Loading...</p>
                 }
             </div>
+
         </div>
     </div>
 </div>
+
 
 @code {
     private List<StudentModel> students;
     private int totalCount;
     private int pageNumber = 1;
-    private int pageSize = 30;
+    private int pageSize = 200;
     private List<SubjectRatingModel> subjectRatings = new List<SubjectRatingModel>
     {
         new SubjectRatingModel { }
@@ -153,6 +157,7 @@ else
     private bool isModalVisible = false;
     private string modalErrorMessage;
 
+    private Dictionary<int, List<SemesterGrade>> groupedSemesterGrades;
     private List<SubjectModel> subjectSuggestions;
     private SubjectRatingModel activeSubjectRating;
 
@@ -186,6 +191,7 @@ else
     {
         isModalVisible = true;
         modalErrorMessage = null;
+        groupedSemesterGrades = new Dictionary<int, List<SemesterGrade>>();
 
         try
         {
@@ -193,6 +199,12 @@ else
             if (modalStudentInfo == null)
             {
                 modalErrorMessage = "Student not found.";
+            }
+            else
+            {
+                groupedSemesterGrades = modalStudentInfo.SemesterGrades
+                    .GroupBy(g => g.Semester)
+                    .ToDictionary(g => g.Key, g => g.ToList());
             }
         }
         catch (HttpRequestException)

@@ -20,10 +20,11 @@ builder.Services.AddDbContext<ApidDbContext>(options =>
     options.UseSqlServer(connectionString)
            .EnableSensitiveDataLogging());
 
-
-builder.Services.AddServices();
-
 builder.Services.AddSwaggerGen();
+
+// Custom extensions
+builder.Services.AddServices();
+builder.Services.AddSwaggerSecuritySetup();
 
 var app = builder.Build();
 
