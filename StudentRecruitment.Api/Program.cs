@@ -1,9 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using StudentRecruitment.Api.Extensions;
 using StudentRecruitment.DAL;
-using StudentRecruitment.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
