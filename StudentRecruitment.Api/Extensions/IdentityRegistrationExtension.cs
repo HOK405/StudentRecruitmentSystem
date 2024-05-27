@@ -8,7 +8,7 @@ namespace StudentRecruitment.Api.Extensions
     {
         public static IServiceCollection AddIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<Student, IdentityRole<int>>(options =>
+            services.AddIdentity<IdentityUser<int>, IdentityRole<int>>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;

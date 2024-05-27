@@ -19,7 +19,7 @@ namespace StudentRecruitment.DAL.Repositories
         }
         public async Task<List<CredentialDto>> ImportStudentsAsync(
             List<StudentImportDto> students,
-            UserManager<Student> userManager)
+            UserManager<IdentityUser<int>> userManager)
         {
             var credentials = new List<CredentialDto>();
 

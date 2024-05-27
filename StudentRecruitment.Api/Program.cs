@@ -20,6 +20,7 @@ builder.Services.AddDbContext<ApidDbContext>(options =>
 builder.Services.AddSwaggerGen();
 
 // Custom extensions
+builder.Services.AddIdentity();
 builder.Services.AddServices();
 builder.Services.AddSwaggerSecuritySetup();
 

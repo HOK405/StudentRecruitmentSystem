@@ -8,9 +8,9 @@ namespace StudentRecruitment.Shared.Utilities
 {
     public class CredentialsGenerator
     {
-        private readonly UserManager<Student> _userManager;
+        private readonly UserManager<IdentityUser<int>> _userManager;
 
-        public CredentialsGenerator(UserManager<Student> userManager)
+        public CredentialsGenerator(UserManager<IdentityUser<int>> userManager)
         {
             _userManager = userManager;
         }

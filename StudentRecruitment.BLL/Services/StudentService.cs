@@ -10,12 +10,12 @@ namespace StudentRecruitment.BLL.Services
 {
     public class StudentService
     {
-        private readonly UserManager<Student> _userManager;
+        private readonly UserManager<IdentityUser<int>> _userManager;
         private readonly IConfiguration _configuration;
         private readonly IStudentRepository _studentRepository;
 
         public StudentService(
-            UserManager<Student> userManager,
+            UserManager<IdentityUser<int>> userManager,
             IConfiguration configuration,
             IStudentRepository studentRepository)
         {
