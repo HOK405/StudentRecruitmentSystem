@@ -1,7 +1,10 @@
 ﻿@page "/student-selection"
 @using System.Net.Http.Json
 @using StudentRecruitment.Presentation.Models
+@using StudentRecruitment.Presentation.Services
+@using StudentRecruitment.Shared.DTOs
 @inject HttpClient Http
+@inject TokenService TokenService
 
 <h3>Student Selection</h3>
 
@@ -76,6 +79,7 @@ else
                     <td>@student.BirthDate.ToString("yyyy-MM-dd")</td>
                     <td>
                         <button class="btn btn-info" @onclick="() => ShowStudentInfo(student.Id)">View</button>
+                        <button class="btn btn-success" @onclick="() => LikeStudent(student.Id)">Like</button>
                     </td>
                 </tr>
             }
@@ -107,6 +111,7 @@ else
                         <p>Patronimic: @modalStudentInfo.Patronimic</p>
                         <p>Description: @modalStudentInfo.Description</p>
                         <p>Birth Date: @modalStudentInfo.BirthDate.ToShortDateString()</p>
+                        <p>Email: @modalStudentInfo.Email</p>
 
                         <h4>Semester Grades</h4>
                         @foreach (var semester in groupedSemesterGrades.Keys.OrderByDescending(k => k))
@@ -141,7 +146,6 @@ else
         </div>
     </div>
 </div>
-
 
 @code {
     private List<StudentModel> students;
@@ -258,5 +262,15 @@ else
         subjectRating.SubjectName = selectedSubject.Name;
         subjectSuggestions = null;
         activeSubjectRating = null;
+    }
+
+    private async Task LikeStudent(int studentId)
+    {
+        var employerId = await TokenService.GetUserIdAsync();
+        await TokenService.LikeStudentAsync(new LikeStudentDto()
+            {
+                EmployerId = employerId,
+                StudentId = studentId
+            });
     }
 }

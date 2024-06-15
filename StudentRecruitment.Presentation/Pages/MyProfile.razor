@@ -1,53 +1,84 @@
 ﻿@page "/myprofile"
 @using StudentRecruitment.Presentation.Models
+@using StudentRecruitment.Presentation.Services
 @inject NavigationManager Navigation
 @inject HttpClient Http
+@inject TokenService TokenService
 
-<h3>MyProfile</h3>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="w-100" style="max-width: 600px;">
 
-<div>
-    <label for="studentId">Enter Student ID:</label>
-    <input type="number" id="studentId" @bind="inputStudentId" />
-    <button @onclick="LoadStudentData">Search</button>
-</div>
-
-@if (isLoading)
-{
-    <p>Loading...</p>
-}
-else if (studentWithGrades != null && groupedGrades != null)
-{
-    <div>
-        <h4>@studentWithGrades.Name @studentWithGrades.Surname</h4>
-        <p><strong>Description:</strong> @studentWithGrades.Description</p>
-        <p><strong>Birth Date:</strong> @studentWithGrades.BirthDate.ToString("yyyy-MM-dd")</p>
-
-        @foreach (var semester in groupedGrades.Keys.OrderByDescending(k => k))
+        @if (isLoading)
         {
-            <article>
-                <h5>Semester @semester</h5>
-                <ul>
-                    @foreach (var grade in groupedGrades[semester])
-                    {
-                        <li>
-                            <strong>@grade.SubjectName:</strong> Grade: @grade.Grade
-                        </li>
-                    }
-                </ul>
-            </article>
+            <p>Loading...</p>
+        }
+        else if (studentWithGrades != null && groupedGrades != null)
+        {
+            <div>
+                <h4>@studentWithGrades.Name @studentWithGrades.Surname</h4>
+                <p><strong>Description:</strong> @studentWithGrades.Description</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Update description" @bind="newDescription" />
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" @onclick="UpdateDescription">Update</button>
+                    </div>
+                </div>
+                <p><strong>Birth Date:</strong> @studentWithGrades.BirthDate.ToString("yyyy-MM-dd")</p>
+                <p><strong>Email:</strong> @studentWithGrades.Email</p>
+
+                @foreach (var semester in groupedGrades.Keys.OrderByDescending(k => k))
+                {
+                    <article>
+                        <h5>Semester @semester</h5>
+                        <ul>
+                            @foreach (var grade in groupedGrades[semester])
+                            {
+                                <li>
+                                    <strong>@grade.SubjectName:</strong> Grade: @grade.Grade
+                                </li>
+                            }
+                        </ul>
+                    </article>
+                }
+            </div>
+        }
+        else if (!isLoading)
+        {
+            <p>No data found or error occurred.</p>
         }
     </div>
-}
-else if (!isLoading)
-{
-    <p>No data found or error occurred.</p>
-}
+</div>
 
 @code {
     private int inputStudentId;
     private StudentWithGradesModel studentWithGrades;
     private Dictionary<int, List<SemesterGrade>> groupedGrades;
     private bool isLoading;
+    private string newDescription;
+    private bool isInitialized = false;
+
+    protected override void OnInitialized()
+    {
+        isInitialized = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && isInitialized)
+        {
+            inputStudentId = await TokenService.GetUserIdAsync();
+            if (inputStudentId > 0)
+            {
+                await LoadStudentData();
+            }
+            else
+            {
+                Navigation.NavigateTo("/login");
+            }
+            isInitialized = false;
+            StateHasChanged();
+        }
+    }
 
     private async Task LoadStudentData()
     {
@@ -60,7 +91,6 @@ else if (!isLoading)
             studentWithGrades = await Http.GetFromJsonAsync<StudentWithGradesModel>($"api/student/{inputStudentId}/grades");
             if (studentWithGrades?.SemesterGrades != null)
             {
-                // Grouping grades by semester
                 groupedGrades = studentWithGrades.SemesterGrades
                     .GroupBy(g => g.Semester)
                     .ToDictionary(g => g.Key, g => g.ToList());
@@ -72,5 +102,21 @@ else if (!isLoading)
         }
 
         isLoading = false;
+    }
+
+    private async Task UpdateDescription()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/student/{inputStudentId}/description", newDescription);
+            if (response.IsSuccessStatusCode)
+            {
+                studentWithGrades.Description = newDescription;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
     }
 }

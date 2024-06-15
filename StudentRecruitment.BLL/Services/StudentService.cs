@@ -82,6 +82,7 @@ namespace StudentRecruitment.BLL.Services
                 Patronimic = student.Patronimic,
                 Description = student.Description,
                 BirthDate = student.BirthDate,
+                Email = student.Email,
                 SemesterGrades = student.SemesterInfos.Select(si => new SemesterGrade
                 {
                     Semester = si.Semester,
@@ -92,6 +93,20 @@ namespace StudentRecruitment.BLL.Services
 
             return outputModel;
         }
+
+        public async Task<bool> UpdateStudentDescriptionAsync(int studentId, string newDescription)
+        {
+            var student = await _studentRepository.GetStudentByIdAsync(studentId);
+            if (student == null)
+            {
+                return false;
+            }
+
+            student.Description = newDescription;
+            await _studentRepository.SaveChangesAsync();
+            return true;
+        }
+
 
         public async Task<bool> DeleteStudentByIdAsync(int studentId)
         {

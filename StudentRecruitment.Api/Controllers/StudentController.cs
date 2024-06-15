@@ -36,6 +36,19 @@ namespace StudentRecruitment.Api.Controllers
             return Ok(studentWithGrades);
         }
 
+        [HttpPut("{studentId}/description")]
+        public async Task<IActionResult> UpdateStudentDescription(int studentId, [FromBody] string newDescription)
+        {
+            var result = await _studentService.UpdateStudentDescriptionAsync(studentId, newDescription);
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { Message = "Description has been successfully updated." });
+        }
+
+
         [HttpDelete("{studentId}")]
         public async Task<IActionResult> DeleteStudent(int studentId)
         {

@@ -1,0 +1,143 @@
+﻿@page "/liked-students"
+@using StudentRecruitment.Presentation.Models
+@using StudentRecruitment.Presentation.Services
+@inject HttpClient Http
+@inject TokenService TokenService
+
+<h3>Liked Students</h3>
+
+@if (likedStudents == null)
+{
+    <p>Loading...</p>
+}
+else if (!likedStudents.Any())
+{
+    <p>No students liked yet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var student in likedStudents)
+        {
+            <li>
+                @student.Name @student.Surname
+                <button class="btn btn-info" @onclick="() => ShowStudentInfo(student.Id)">View Info</button>
+                <button class="btn btn-danger" @onclick="() => DislikeStudent(student.Id)">Dislike</button>
+            </li>
+        }
+    </ul>
+}
+
+@* Modal *@
+<div class="modal fade @(isModalVisible ? "show d-block" : "d-none")" tabindex="-1" role="dialog" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentInfoModalLabel">Student Information</h5>
+                <button type="button" class="close" aria-label="Close" @onclick="CloseModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (modalErrorMessage != null)
+                {
+                    <div class="alert alert-danger">@modalErrorMessage</div>
+                }
+                else if (modalStudentInfo != null && groupedSemesterGrades != null)
+                {
+                    <div>
+                        <h4>Student Details</h4>
+                        <p>Name: @modalStudentInfo.Name</p>
+                        <p>Surname: @modalStudentInfo.Surname</p>
+                        <p>Description: @modalStudentInfo.Description</p>
+                        <p>Birth Date: @modalStudentInfo.BirthDate.ToShortDateString()</p>
+                        <p>Email: @modalStudentInfo.Email</p>
+
+                        <h4>Semester Grades</h4>
+                        @foreach (var semester in groupedSemesterGrades.Keys.OrderByDescending(k => k))
+                        {
+                            <h5>Semester @semester</h5>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var grade in groupedSemesterGrades[semester])
+                                    {
+                                        <tr>
+                                            <td>@grade.SubjectName</td>
+                                            <td>@grade.Grade</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>Loading...</p>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<StudentModel> likedStudents;
+    private StudentWithGradesModel modalStudentInfo;
+    private bool isModalVisible = false;
+    private string modalErrorMessage;
+    private Dictionary<int, List<SemesterGrade>> groupedSemesterGrades;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TokenService.InitializeAsync();
+        var employerId = await TokenService.GetUserIdAsync();
+        likedStudents = await Http.GetFromJsonAsync<List<StudentModel>>($"api/employer/liked-students/{employerId}");
+    }
+
+    private async Task ShowStudentInfo(int studentId)
+    {
+        isModalVisible = true;
+        modalErrorMessage = null;
+        groupedSemesterGrades = new Dictionary<int, List<SemesterGrade>>();
+
+        try
+        {
+            modalStudentInfo = await Http.GetFromJsonAsync<StudentWithGradesModel>($"api/student/{studentId}/grades");
+            if (modalStudentInfo == null)
+            {
+                modalErrorMessage = "Student not found.";
+            }
+            else
+            {
+                groupedSemesterGrades = modalStudentInfo.SemesterGrades
+                    .GroupBy(g => g.Semester)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+            }
+        }
+        catch (HttpRequestException)
+        {
+            modalErrorMessage = "Error fetching student information. Please try again.";
+        }
+    }
+
+    private void CloseModal()
+    {
+        isModalVisible = false;
+        modalStudentInfo = null;
+    }
+
+    private async Task DislikeStudent(int studentId)
+    {
+        var employerId = await TokenService.GetUserIdAsync();
+        var response = await Http.DeleteAsync($"api/employer/dislike-student/{employerId}/{studentId}");
+
+        likedStudents.RemoveAll(s => s.Id == studentId);
+    }
+}

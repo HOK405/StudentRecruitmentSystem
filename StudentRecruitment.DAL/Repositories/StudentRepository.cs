@@ -72,33 +72,40 @@ namespace StudentRecruitment.DAL.Repositories
         // Алгоритм зваженого оціюнвання
         public async Task<List<Student>> GetBestSuitedStudentsAsync(Dictionary<int, int> subjectRatings)
         {
+            // Get all relevant semester info
             var studentScores = await _dbContext.SemesterInfos
                 .Where(si => subjectRatings.Keys.Contains(si.SubjectId))
-                .Select(si => new
-                {
-                    si.StudentId,
-                    si.SubjectId,
-                    si.Grade
-                })
                 .ToListAsync();
 
+            // Group by student and subject, then calculate average grade per subject per student
             var groupedScores = studentScores
-                .GroupBy(si => si.StudentId)
+                .GroupBy(si => new { si.StudentId, si.SubjectId })
                 .Select(g => new
                 {
-                    StudentId = g.Key,
-                    TotalScore = g.Sum(si => si.Grade * subjectRatings[si.SubjectId])
+                    g.Key.StudentId,
+                    g.Key.SubjectId,
+                    AverageGrade = g.Average(si => si.Grade)
                 })
                 .ToList();
 
-            var studentIds = groupedScores.Select(s => s.StudentId).ToList();
+            // Calculate the total weighted score for each student
+            var totalScores = groupedScores
+                .GroupBy(gs => gs.StudentId)
+                .Select(g => new
+                {
+                    StudentId = g.Key,
+                    TotalScore = g.Sum(gs => gs.AverageGrade * subjectRatings[gs.SubjectId])
+                })
+                .ToList();
+
+            var studentIds = totalScores.Select(ts => ts.StudentId).ToList();
 
             var students = await _dbContext.Students
-                .Where(s => studentIds.Contains(s.Id) && s.IsPublicProfile) 
+                .Where(s => studentIds.Contains(s.Id) && s.IsPublicProfile)
                 .ToListAsync();
 
             var sortedStudents = students
-                .Join(groupedScores, student => student.Id, score => score.StudentId, (student, score) => new
+                .Join(totalScores, student => student.Id, score => score.StudentId, (student, score) => new
                 {
                     Student = student,
                     score.TotalScore
@@ -109,6 +116,7 @@ namespace StudentRecruitment.DAL.Repositories
 
             return sortedStudents;
         }
+
 
         public async Task<Student> GetStudentWithGradesAsync(int studentId)
         {

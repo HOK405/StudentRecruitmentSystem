@@ -7,5 +7,7 @@ namespace StudentRecruitment.Domain.Entities
         public string CompanyName { get; set; }
         public string Location { get; set; }
         public string Phone { get; set; }
+
+        public ICollection<StudentEmployer> StudentEmployers { get; set; }
     }
 }

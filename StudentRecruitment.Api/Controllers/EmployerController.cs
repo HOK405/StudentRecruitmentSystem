@@ -28,5 +28,47 @@ namespace StudentRecruitment.Api.Controllers
                 return BadRequest(new { ex.Message });
             }
         }
+
+        [HttpPost("like")]
+        public async Task<IActionResult> LikeStudent([FromBody] LikeStudentDto likeStudentDto)
+        {
+            try
+            {
+                await _employerService.LikeStudentAsync(likeStudentDto.EmployerId, likeStudentDto.StudentId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpGet("liked-students/{employerId}")]
+        public async Task<IActionResult> GetLikedStudents(int employerId)
+        {
+            try
+            {
+                var likedStudents = await _employerService.GetLikedStudentsAsync(employerId);
+                return Ok(likedStudents);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpDelete("dislike-student/{employerId}/{studentId}")]
+        public async Task<IActionResult> DislikeStudent(int employerId, int studentId)
+        {
+            try
+            {
+                await _employerService.DislikeStudentAsync(employerId, studentId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentRecruitment.DAL;
 
@@ -11,9 +12,11 @@ using StudentRecruitment.DAL;
 namespace StudentRecruitment.DAL.Migrations
 {
     [DbContext(typeof(ApidDbContext))]
-    partial class ApidDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527112441_AddNaviationProperty")]
+    partial class AddNaviationProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

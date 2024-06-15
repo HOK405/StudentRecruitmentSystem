@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
+using StudentRecruitment.Shared.DTOs;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace StudentRecruitment.Presentation.Services
 {
@@ -8,10 +8,22 @@ namespace StudentRecruitment.Presentation.Services
     {
         private readonly IJSRuntime _jsRuntime;
         private string _cachedToken;
+        private readonly HttpClient _http;
 
-        public TokenService(IJSRuntime jsRuntime)
+        public TokenService(IJSRuntime jsRuntime, HttpClient http)
         {
             _jsRuntime = jsRuntime;
+            _http = http;
+        }
+
+        public async Task InitializeAsync()
+        {
+            _cachedToken = await GetTokenFromLocalStorageAsync();
+        }
+
+        private async Task<string> GetTokenFromLocalStorageAsync()
+        {
+            return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
         }
 
         public async Task SetTokenAsync(string token)
@@ -27,7 +39,7 @@ namespace StudentRecruitment.Presentation.Services
                 return _cachedToken;
             }
 
-            _cachedToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            _cachedToken = await GetTokenFromLocalStorageAsync();
             return _cachedToken;
         }
 
@@ -35,6 +47,12 @@ namespace StudentRecruitment.Presentation.Services
         {
             _cachedToken = null;
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+        }
+
+        public async Task LikeStudentAsync(LikeStudentDto likeStudentDto)
+        {
+            var response = await _http.PostAsJsonAsync("api/employer/like", likeStudentDto);
+            response.EnsureSuccessStatusCode();
         }
 
         public async Task<string> GetUserRoleAsync()
@@ -51,9 +69,18 @@ namespace StudentRecruitment.Presentation.Services
             return roleClaim?.Value;
         }
 
-        public async Task InitializeAsync()
+        public async Task<int> GetUserIdAsync()
         {
-            _cachedToken = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            var token = await GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                return 0;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+            var userIdClaim = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == "nameid");
+            return int.Parse(userIdClaim?.Value ?? "0");
         }
 
         public async Task<bool> IsAuthenticatedAsync()

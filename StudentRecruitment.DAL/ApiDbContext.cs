@@ -23,10 +23,12 @@ namespace StudentRecruitment.DAL
         {
             base.OnModelCreating(builder);
 
+            // Configure tables
             builder.Entity<Student>().ToTable("Students");
             builder.Entity<Employer>().ToTable("Employers");
             builder.Entity<Admin>().ToTable("Admins");
 
+            // Configure Student entity
             builder.Entity<Student>(b =>
             {
                 b.Property(s => s.Description).IsRequired(false);
@@ -35,44 +37,57 @@ namespace StudentRecruitment.DAL
                  .WithOne(s => s.Student)
                  .HasForeignKey(si => si.StudentId)
                  .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasMany(s => s.StudentEmployers)
+                 .WithOne(se => se.Student)
+                 .HasForeignKey(se => se.StudentId)
+                 .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // Configure Employer entity
             builder.Entity<Employer>(b =>
             {
-                b.HasMany<StudentEmployer>()
+                b.HasMany(e => e.StudentEmployers)
                  .WithOne(se => se.Employer)
                  .HasForeignKey(se => se.EmployerId)
                  .IsRequired()
                  .OnDelete(DeleteBehavior.Restrict);
             });
 
-            builder.Entity<Subject>()
-                .HasKey(s => s.Id);
-            builder.Entity<Subject>()
-                .Property(s => s.Id)
-                .ValueGeneratedNever();
-            builder.Entity<Subject>()
-                .HasMany(s => s.SemesterInfos)
-                .WithOne(si => si.Subject)
-                .HasForeignKey(si => si.SubjectId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Configure Subject entity
+            builder.Entity<Subject>(b =>
+            {
+                b.HasKey(s => s.Id);
+                b.Property(s => s.Id).ValueGeneratedNever();
 
-            builder.Entity<SemesterInfo>()
-                .HasKey(si => new { si.StudentId, si.SubjectId, si.Semester });
+                b.HasMany(s => s.SemesterInfos)
+                 .WithOne(si => si.Subject)
+                 .HasForeignKey(si => si.SubjectId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
 
-            builder.Entity<StudentEmployer>()
-                .HasKey(se => new { se.StudentId, se.EmployerId });
-            builder.Entity<StudentEmployer>()
-                .HasOne(se => se.Student)
-                .WithMany(s => s.StudentEmployers)
-                .HasForeignKey(se => se.StudentId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configure SemesterInfo entity
+            builder.Entity<SemesterInfo>(b =>
+            {
+                b.HasKey(si => new { si.StudentId, si.SubjectId, si.Semester });
+            });
 
-            builder.Entity<StudentEmployer>()
-                .HasOne(se => se.Employer)
-                .WithMany()
-                .HasForeignKey(se => se.EmployerId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // Configure StudentEmployer entity
+            builder.Entity<StudentEmployer>(b =>
+            {
+                b.HasKey(se => new { se.StudentId, se.EmployerId });
+
+                b.HasOne(se => se.Student)
+                 .WithMany(s => s.StudentEmployers)
+                 .HasForeignKey(se => se.StudentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                b.HasOne(se => se.Employer)
+                 .WithMany(e => e.StudentEmployers) 
+                 .HasForeignKey(se => se.EmployerId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
         }
+
     }
 }
