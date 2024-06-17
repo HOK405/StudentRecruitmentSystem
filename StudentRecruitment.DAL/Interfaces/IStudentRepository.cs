@@ -18,6 +18,8 @@ namespace StudentRecruitment.DAL.Interfaces
 
         Task DeleteStudentAsync(Student student);
 
+        Task DeleteAllStudentsAsync();
+
         Task SaveChangesAsync();
     }
 }

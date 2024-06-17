@@ -68,5 +68,11 @@ namespace StudentRecruitment.BLL.Services
                 PageSize = pageSize
             };
         }
+
+        public async Task<bool> DeleteAllSubjectsAsync()
+        {
+            await _subjectRepository.DeleteAllSubjectsAsync();
+            return true;
+        }
     }
 }

@@ -6,86 +6,116 @@
 @inject HttpClient Http
 @inject TokenService TokenService
 
-<h3>Student Selection</h3>
+<h3 class="text-center">Student Selection</h3>
 
-<div class="row">
-    @foreach (var subjectRating in subjectRatings)
-    {
-        <div class="col-md-4">
-            <div class="position-relative">
-                <input type="text" @bind="subjectRating.SubjectName" class="form-control" placeholder="Search Subject" @oninput="async e => await SearchSubjects(e, subjectRating)" @onfocus="() => SetActiveSubjectRating(subjectRating)" @onblur="ClearActiveSubjectRating" />
-                @if (activeSubjectRating == subjectRating && subjectSuggestions != null && subjectSuggestions.Any())
-                {
-                    <ul class="list-group position-absolute w-100" style="z-index: 1000;">
-                        @foreach (var suggestion in subjectSuggestions)
-                        {
-                            <li class="list-group-item" @onclick="() => SelectSubject(subjectRating, suggestion)">
-                                @suggestion.Name
-                            </li>
-                        }
-                    </ul>
-                }
+<div class="container">
+    <div class="row justify-content-center mb-3">
+        <div class="col-md-12">
+            <button class="btn btn-info" @onclick="ToggleInstructions">Show Instructions</button>
+            <div class="instructions mt-3 @(showInstructions ? "d-block" : "d-none")">
+                <p>
+                    Here you can select subjects that are relevant to your vacancy and set their importance. Use the following steps:
+                </p>
+                <ol>
+                    <li>Enter the subject name in the search box and select from the suggestions.</li>
+                    <li>Use the slider to set the importance of the subject on a scale of 1 to 10.</li>
+                    <li>Click "Add subject" to include additional subjects.</li>
+                    <li>Click "Search" to find students matching the selected criteria.</li>
+                    <li>Use the "View" button to see detailed information about a student.</li>
+                    <li>Also you can add any student to the favourite list, using the "Like" button</li>
+                </ol>
             </div>
         </div>
+    </div>
+
+    <div class="row justify-content-center">
+        @foreach (var subjectRating in subjectRatings)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="position-relative">
+                    <input type="text" @bind="subjectRating.SubjectName" class="form-control" placeholder="Search Subject" @oninput="async e => await SearchSubjects(e, subjectRating)" @onfocus="() => SetActiveSubjectRating(subjectRating)" @onblur="ClearActiveSubjectRating" />
+                    @if (activeSubjectRating == subjectRating && subjectSuggestions != null && subjectSuggestions.Any())
+                    {
+                        <ul class="list-group position-absolute w-100" style="z-index: 1000;">
+                            @foreach (var suggestion in subjectSuggestions)
+                            {
+                                <li class="list-group-item" @onclick="() => SelectSubject(subjectRating, suggestion)">
+                                    @suggestion.Name
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex flex-column align-items-center">
+                    <input type="range" @bind="subjectRating.Rating" class="form-range modern-slider" min="1" max="10" step="1" />
+                    <span>@subjectRating.Rating</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <button class="btn btn-danger w-100" @onclick="() => RemoveSubjectRating(subjectRating)">Remove</button>
+            </div>
+        }
+    </div>
+    <div class="row justify-content-center mb-3">
         <div class="col-md-4">
-            <input type="number" @bind="subjectRating.Rating" class="form-control" placeholder="Rating" />
+            <button class="btn btn-success action-button w-100" @onclick="AddSubjectRating">Add subject</button>
         </div>
+    </div>
+    <div class="row justify-content-center mb-3">
         <div class="col-md-4">
-            <button class="btn btn-danger" @onclick="() => RemoveSubjectRating(subjectRating)">Remove</button>
+            <button class="btn btn-primary action-button w-100" @onclick="SearchStudents">Search</button>
         </div>
+    </div>
+    @if (students == null)
+    {
+        <p class="text-center">Please, select subjects, you want to see among candidates</p>
     }
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <button class="btn btn-success" @onclick="AddSubjectRating">Add Another Subject</button>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <button class="btn btn-primary" @onclick="SearchStudents">Search</button>
-    </div>
-</div>
-
-@if (students == null)
-{
-    <p>Loading...</p>
-}
-else if (students.Count == 0)
-{
-    <p>No students found.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Patronimic</th>
-                <th>Birth Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var student in students)
-            {
+    else if (students.Count == 0)
+    {
+        <p class="text-center">No students found.</p>
+    }
+    else
+    {
+        <table class="table table-striped table-hover animate-fade-in">
+            <thead>
                 <tr>
-                    <td>@student.Id</td>
-                    <td>@student.Name</td>
-                    <td>@student.Surname</td>
-                    <td>@student.Patronimic</td>
-                    <td>@student.BirthDate.ToString("yyyy-MM-dd")</td>
-                    <td>
-                        <button class="btn btn-info" @onclick="() => ShowStudentInfo(student.Id)">View</button>
-                        <button class="btn btn-success" @onclick="() => LikeStudent(student.Id)">Like</button>
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Patronimic</th>
+                    <th>Birth Date</th>
+                    <th>Action</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var student in students)
+                {
+                    <tr>
+                        <td>@student.Id</td>
+                        <td>@student.Name</td>
+                        <td>@student.Surname</td>
+                        <td>@student.Patronimic</td>
+                        <td>@student.BirthDate.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <button class="btn btn-info me-2" @onclick="() => ShowStudentInfo(student.Id)">
+                                <i class="bi bi-search"></i> View
+                            </button>
+                            @if (role != "Admin")
+                            {
+                                <button class="btn btn-success" @onclick="() => LikeStudent(student.Id)">
+                                    <i class="bi bi-heart-fill"></i> Like
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
 
 @* Modal *@
 <div class="modal fade @(isModalVisible ? "show d-block" : "d-none")" tabindex="-1" role="dialog" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
@@ -93,7 +123,7 @@ else
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="studentInfoModalLabel">Student Information</h5>
-                <button type="button" class="close" aria-label="Close" @onclick="CloseModal">
+                <button type="button" class="btn-close" aria-label="Close" @onclick="CloseModal">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -142,7 +172,6 @@ else
                     <p>Loading...</p>
                 }
             </div>
-
         </div>
     </div>
 </div>
@@ -154,16 +183,35 @@ else
     private int pageSize = 200;
     private List<SubjectRatingModel> subjectRatings = new List<SubjectRatingModel>
     {
-        new SubjectRatingModel { }
+        new SubjectRatingModel { Rating = 1 }
     };
 
     private StudentWithGradesModel modalStudentInfo;
     private bool isModalVisible = false;
     private string modalErrorMessage;
+    private string role;
+    private bool isAuthenticated;
 
     private Dictionary<int, List<SemesterGrade>> groupedSemesterGrades;
     private List<SubjectModel> subjectSuggestions;
     private SubjectRatingModel activeSubjectRating;
+    private bool showInstructions = false;
+
+    protected override void OnInitialized()
+    {
+        // Initialization logic
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await TokenService.InitializeAsync();
+            isAuthenticated = await TokenService.IsAuthenticatedAsync();
+            role = await TokenService.GetUserRoleAsync();
+            StateHasChanged();
+        }
+    }
 
     public async Task SearchStudents()
     {
@@ -183,7 +231,7 @@ else
 
     private void AddSubjectRating()
     {
-        subjectRatings.Add(new SubjectRatingModel());
+        subjectRatings.Add(new SubjectRatingModel { Rating = 1 });
     }
 
     private void RemoveSubjectRating(SubjectRatingModel subjectRating)
@@ -272,5 +320,10 @@ else
                 EmployerId = employerId,
                 StudentId = studentId
             });
+    }
+
+    private void ToggleInstructions()
+    {
+        showInstructions = !showInstructions;
     }
 }

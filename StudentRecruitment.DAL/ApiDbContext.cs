@@ -88,6 +88,5 @@ namespace StudentRecruitment.DAL
                  .OnDelete(DeleteBehavior.Restrict);
             });
         }
-
     }
 }

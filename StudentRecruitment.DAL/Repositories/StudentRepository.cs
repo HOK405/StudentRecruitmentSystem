@@ -126,6 +126,22 @@ namespace StudentRecruitment.DAL.Repositories
                 .FirstOrDefaultAsync(s => s.Id == studentId);
         }
 
+        public async Task DeleteAllStudentsAsync()
+        {
+            // Delete related data from other tables using raw SQL
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM StudentEmployers WHERE StudentId IN (SELECT Id FROM Students)");
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM SemesterInfos WHERE StudentId IN (SELECT Id FROM Students)");
+
+            // Delete students from the AspNetUsers table using raw SQL
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM AspNetUsers WHERE Id IN (SELECT Id FROM Students)");
+
+            // Delete students from the Students table
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Students");
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+
         public async Task DeleteStudentAsync(Student student)
         {
             _dbContext.Students.Remove(student);

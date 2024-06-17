@@ -1,4 +1,13 @@
-﻿/* Add padding and margins to elements for better spacing */
+﻿.container {
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fly-in 1s ease-out;
+}
+
+.text-center {
+    text-align: center;
+}
+
 .row {
     margin-bottom: 15px;
 }
@@ -8,15 +17,64 @@
 }
 
 /* Style the input fields */
-input[type="text"], input[type="number"] {
+input[type="text"], input[type="range"] {
     padding: 10px;
     font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, input[type="range"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Style the range input specifically */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: #ddd;
+    border: none;
+    border-radius: 3px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+input[type="range"]::-moz-range-track {
+    height: 8px;
+    background: #ddd;
+    border: none;
+    border-radius: 3px;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 /* Style the buttons */
 button {
     padding: 10px 20px;
     font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 /* Style the suggestion list */
@@ -31,16 +89,85 @@ ul.list-group {
     cursor: pointer;
 }
 
-    ul.list-group li {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
+ul.list-group li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+ul.list-group li:hover {
+    background-color: #f8f9fa;
+}
+
+/* Ensure the suggestion list is clickable */
+ul.list-group li {
+    cursor: pointer;
+}
+
+/* Enhance the close button in the modal */
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #000;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+/* Ensure consistent button sizes for action buttons */
+.action-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    width: 100%;
+}
+
+/* Animation for page content */
+@keyframes fly-in {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
     }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
 
-        ul.list-group li:hover {
-            background-color: #f8f9fa;
-        }
+/* Fade in animation for tables */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 
-    /* Ensure the suggestion list is clickable */
-    ul.list-group li {
+.table {
+    animation: fade-in 0.5s ease-in-out;
+}
+
+
+
+.modal.fade.show.d-block {
+    display: block;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-close {
+    border: none;
+    background: transparent;
+}
+
+    .btn-close:hover {
         cursor: pointer;
     }
+

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using StudentRecruitment.BLL.DTOs.Output;
 using StudentRecruitment.DAL.Interfaces;
 using StudentRecruitment.Domain.Entities;
@@ -62,6 +63,27 @@ namespace StudentRecruitment.BLL.Services
                 Patronimic = s.Patronimic,
                 BirthDate = s.BirthDate
             }).ToList();
+        }
+
+        public async Task<bool> DeleteAllEmployersAsync()
+        {
+            await _employerRepository.DeleteAllEmployersAsync();
+            return true;
+        }
+
+
+        public async Task<bool> ChangePasswordAsync(string username, string newPassword)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            return result.Succeeded;
         }
 
         public async Task DislikeStudentAsync(int employerId, int studentId)

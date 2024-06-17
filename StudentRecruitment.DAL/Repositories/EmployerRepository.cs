@@ -37,6 +37,15 @@ namespace StudentRecruitment.DAL.Repositories
                 .ToListAsync();
         }
 
+        public async Task DeleteAllEmployersAsync()
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM StudentEmployers WHERE EmployerId IN (SELECT Id FROM Employers)");
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM AspNetUsers WHERE Id IN (SELECT Id FROM Employers)");
+            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM Employers");
+
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task DislikeStudentAsync(int employerId, int studentId)
         {
             var studentEmployer = await _dbContext.StudentEmployers

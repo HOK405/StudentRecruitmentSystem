@@ -8,6 +8,9 @@ namespace StudentRecruitment.DAL.Interfaces
         IQueryable<Subject> GetSubjects();
 
         Task<List<Subject>> GetSubjectsByNameAsync(string name);
+
+        Task DeleteAllSubjectsAsync();
+
         Task SaveChangesAsync();
     }
 }

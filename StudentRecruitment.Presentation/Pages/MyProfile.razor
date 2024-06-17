@@ -7,7 +7,6 @@
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
     <div class="w-100" style="max-width: 600px;">
-
         @if (isLoading)
         {
             <p>Loading...</p>
@@ -26,6 +25,19 @@
                 <p><strong>Birth Date:</strong> @studentWithGrades.BirthDate.ToString("yyyy-MM-dd")</p>
                 <p><strong>Email:</strong> @studentWithGrades.Email</p>
 
+                <div class="d-flex align-items-center">
+                    <div>
+                        Your profile is
+                        <span class="@ProfileStatusClass">
+                            <strong>@ProfileStatusText</strong>
+                        </span>
+                    </div>
+                    <div class="form-check form-switch ms-3">
+                        <input type="checkbox" class="form-check-input" id="publicProfileCheck" @bind="studentWithGrades.IsPublicProfile" @bind:after="UpdateIsPublicProfile">
+                        <label class="form-check-label" for="publicProfileCheck">Public Profile</label>
+                    </div>
+                </div>
+
                 @foreach (var semester in groupedGrades.Keys.OrderByDescending(k => k))
                 {
                     <article>
@@ -34,7 +46,7 @@
                             @foreach (var grade in groupedGrades[semester])
                             {
                                 <li>
-                                    <strong>@grade.SubjectName:</strong> Grade: @grade.Grade
+                                    <strong>@grade.SubjectName:</strong> @grade.Grade
                                 </li>
                             }
                         </ul>
@@ -119,4 +131,23 @@
             throw;
         }
     }
+
+    private async Task UpdateIsPublicProfile()
+    {
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/student/{inputStudentId}/is-public-profile", studentWithGrades.IsPublicProfile);
+            if (!response.IsSuccessStatusCode)
+            {
+                studentWithGrades.IsPublicProfile = !studentWithGrades.IsPublicProfile;
+            }
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
+    }
+
+    private string ProfileStatusText => studentWithGrades.IsPublicProfile ? "public" : "private";
+    private string ProfileStatusClass => studentWithGrades.IsPublicProfile ? "text-success" : "text-danger";
 }

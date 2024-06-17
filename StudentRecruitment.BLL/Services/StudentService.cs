@@ -81,6 +81,7 @@ namespace StudentRecruitment.BLL.Services
                 Surname = student.Surname,
                 Patronimic = student.Patronimic,
                 Description = student.Description,
+                IsPublicProfile = student.IsPublicProfile,
                 BirthDate = student.BirthDate,
                 Email = student.Email,
                 SemesterGrades = student.SemesterInfos.Select(si => new SemesterGrade
@@ -107,6 +108,29 @@ namespace StudentRecruitment.BLL.Services
             return true;
         }
 
+        public async Task<bool> UpdateIsPublicProfileAsync(int studentId, bool isPublicProfile)
+        {
+            var student = await _studentRepository.GetStudentByIdAsync(studentId);
+            if (student == null) return false;
+
+            student.IsPublicProfile = isPublicProfile;
+            await _studentRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ChangePasswordAsync(string username, string newPassword)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                return false;
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            return result.Succeeded;
+        }
 
         public async Task<bool> DeleteStudentByIdAsync(int studentId)
         {
@@ -118,6 +142,12 @@ namespace StudentRecruitment.BLL.Services
 
             await _studentRepository.DeleteStudentAsync(student);
             await _studentRepository.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteAllStudentsAsync()
+        {
+            await _studentRepository.DeleteAllStudentsAsync();
             return true;
         }
     }

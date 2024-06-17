@@ -1,20 +1,132 @@
-﻿/* Add padding and margins to elements for better spacing */
-.row {
+﻿.operation-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 70%;
+    margin: auto;
+}
+
+.operation-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+
+    .operation-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+.operation-header {
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.operation-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.import-subjects .operation-header {
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
+
+.import-students .operation-header {
+    background-color: #cce5ff;
+    border-color: #b8daff;
+}
+
+.delete-students .operation-header {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.delete-subjects .operation-header {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.delete-employers .operation-header {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+    .modal-header h5 {
+        margin: 0;
+    }
+
+.close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal-body .form-group {
     margin-bottom: 15px;
 }
 
-.col-md-6 {
-    margin-bottom: 15px;
+.button-container {
+    display: flex;
+    justify-content: flex-end;
 }
 
-/* Style the buttons */
 button {
     padding: 10px 20px;
     font-size: 14px;
     margin-top: 10px;
 }
 
-/* Style the alert messages */
 .alert {
     margin-top: 10px;
+}
+
+.centered-input {
+    max-width: 400px;
+    width: 100%;
+}
+
+.centered-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }

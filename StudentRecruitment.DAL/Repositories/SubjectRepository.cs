@@ -24,11 +24,6 @@ namespace StudentRecruitment.DAL.Repositories
             }
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
-        }
-
         public IQueryable<Subject> GetSubjects()
         {
             return _context.Subjects.AsQueryable();
@@ -39,6 +34,17 @@ namespace StudentRecruitment.DAL.Repositories
             return await _context.Subjects
                                  .Where(s => s.Name.Contains(name))
                                  .ToListAsync();
+        }
+
+        public async Task DeleteAllSubjectsAsync()
+        {
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM Subjects");
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

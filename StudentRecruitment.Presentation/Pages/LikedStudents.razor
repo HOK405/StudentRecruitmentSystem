@@ -4,28 +4,38 @@
 @inject HttpClient Http
 @inject TokenService TokenService
 
-<h3>Liked Students</h3>
+<h3 class="text-center my-4">Liked Students</h3>
 
 @if (likedStudents == null)
 {
-    <p>Loading...</p>
+    <div class="d-flex justify-content-center">
+        <p>Loading...</p>
+    </div>
 }
 else if (!likedStudents.Any())
 {
-    <p>No students liked yet.</p>
+    <div class="d-flex justify-content-center">
+        <p>No students liked yet.</p>
+    </div>
 }
 else
 {
-    <ul>
-        @foreach (var student in likedStudents)
-        {
-            <li>
-                @student.Name @student.Surname
-                <button class="btn btn-info" @onclick="() => ShowStudentInfo(student.Id)">View Info</button>
-                <button class="btn btn-danger" @onclick="() => DislikeStudent(student.Id)">Dislike</button>
-            </li>
-        }
-    </ul>
+    <div class="d-flex justify-content-center">
+        <ul class="list-group w-50">
+            @foreach (var student in likedStudents)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>@student.Name @student.Surname</strong>
+                    </div>
+                    <div>
+                        <button class="btn btn-info me-2" @onclick="() => ShowStudentInfo(student.Id)">View Info</button>
+                        <button class="btn btn-danger" @onclick="() => DislikeStudent(student.Id)">Dislike</button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
 }
 
 @* Modal *@
@@ -34,9 +44,7 @@ else
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="studentInfoModalLabel">Student Information</h5>
-                <button type="button" class="close" aria-label="Close" @onclick="CloseModal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="CloseModal"></button>
             </div>
             <div class="modal-body">
                 @if (modalErrorMessage != null)
@@ -47,17 +55,17 @@ else
                 {
                     <div>
                         <h4>Student Details</h4>
-                        <p>Name: @modalStudentInfo.Name</p>
-                        <p>Surname: @modalStudentInfo.Surname</p>
-                        <p>Description: @modalStudentInfo.Description</p>
-                        <p>Birth Date: @modalStudentInfo.BirthDate.ToShortDateString()</p>
-                        <p>Email: @modalStudentInfo.Email</p>
+                        <p><strong>Name:</strong> @modalStudentInfo.Name</p>
+                        <p><strong>Surname:</strong> @modalStudentInfo.Surname</p>
+                        <p><strong>Description:</strong> @modalStudentInfo.Description</p>
+                        <p><strong>Birth Date:</strong> @modalStudentInfo.BirthDate.ToShortDateString()</p>
+                        <p><strong>Email:</strong> @modalStudentInfo.Email</p>
 
                         <h4>Semester Grades</h4>
                         @foreach (var semester in groupedSemesterGrades.Keys.OrderByDescending(k => k))
                         {
                             <h5>Semester @semester</h5>
-                            <table class="table">
+                            <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>Subject</th>
@@ -82,7 +90,6 @@ else
                     <p>Loading...</p>
                 }
             </div>
-
         </div>
     </div>
 </div>

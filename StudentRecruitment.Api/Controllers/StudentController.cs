@@ -48,6 +48,17 @@ namespace StudentRecruitment.Api.Controllers
             return Ok(new { Message = "Description has been successfully updated." });
         }
 
+        [HttpPut("{studentId}/is-public-profile")]
+        public async Task<IActionResult> UpdateIsPublicProfile(int studentId, [FromBody] bool isPublicProfile)
+        {
+            var result = await _studentService.UpdateIsPublicProfileAsync(studentId, isPublicProfile);
+            if (result)
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+
 
         [HttpDelete("{studentId}")]
         public async Task<IActionResult> DeleteStudent(int studentId)

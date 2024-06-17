@@ -9,6 +9,7 @@ namespace StudentRecruitment.DAL.Interfaces
         Task LikeStudentAsync(int employerId, int studentId);
 
         Task<List<Student>> GetLikedStudentsAsync(int employerId);
+        Task DeleteAllEmployersAsync();
 
         Task DislikeStudentAsync(int employerId, int studentId);
     }
